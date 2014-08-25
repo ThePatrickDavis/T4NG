@@ -1,0 +1,40 @@
+<#@ template language="C#" debug="True" #>
+<#@ output extension="txt" #>
+<#@ include file="T4Toolbox.tt" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="$(SolutionDir)T4NG.Utilities\bin\Debug\T4NG.Utilities.dll" #>
+<#@ assembly name="Microsoft.SqlServer.ConnectionInfo" #>
+<#@ assembly name="Microsoft.SqlServer.Smo" #>
+<#@ assembly name="Microsoft.SqlServer.Management.Sdk.Sfc" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="Microsoft.SqlServer.Management.Common" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="Microsoft.SqlServer" #>
+<#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
+<#@ import namespace="T4NG.Utilities" #>
+<#
+// <copyright file="Generator.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+	// Load Settings from config.json
+	string localDir = Host.ResolvePath("");
+	SettingsHelper.LoadSettings(localDir + @"\config.json");
+	// Establish Database Connection
+    SqlConnection sqlConnection = new SqlConnection(SettingsHelper.Settings.ConnectionString);
+	ServerConnection conn = new ServerConnection(sqlConnection);
+	Server srv = new Server(conn);
+	Database database = new Database(srv, SettingsHelper.Settings.Database);
+	database.Refresh();
+	string version = srv.Information.Version.ToString(); 
+#>
+Generation Output
+-----------------
+Database Version: <#= version #>
+<#
+	// Get a list of all tables in database
+    foreach (Table table in database.Tables)
+    {
+		 WriteLine("Generating " + table.Schema + "." + table.Name);
+    };
+#>
