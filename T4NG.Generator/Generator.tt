@@ -12,10 +12,12 @@
 <#@ import namespace="Microsoft.SqlServer" #>
 <#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
 <#@ import namespace="T4NG.Utilities" #>
+<#@ import namespace="System.Runtime.Remoting.Messaging" #>
+<#@ include file="ProcessTemplate.tt" #>
 <#
 // <copyright file="Generator.tt" company="">
 //  Copyright © . All Rights Reserved.
-// </copyright>
+// </copyright>																						
 
 	// Load Settings from config.json
 	string localDir = Host.ResolvePath("");
@@ -33,8 +35,14 @@ Generation Output
 Database Version: <#= version #>
 <#
 	// Get a list of all tables in database
-    foreach (Table table in database.Tables)
+    foreach (Table tbl in database.Tables)
     {
+		Table table = tbl;
 		 WriteLine("Generating " + table.Schema + "." + table.Name);
+		CallContext.SetData("Standalone1.Parameter", table);
+		ProcessTemplate(@"Templates\Entity.tt.include", @"..\" + SettingsHelper.Settings.EntityProject.Assembly + @"\" + table.Name + ".cs"); 
     };
+	
 #>
+
+Generation Completed

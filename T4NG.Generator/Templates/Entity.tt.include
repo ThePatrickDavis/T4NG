@@ -1,0 +1,46 @@
+<#@ template language="C#" debug="True" #>
+<#@ output extension="txt" #>
+<#@ include file="T4Toolbox.tt" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="Microsoft.SqlServer.ConnectionInfo" #>
+<#@ assembly name="Microsoft.SqlServer.Smo" #>
+<#@ assembly name="Microsoft.SqlServer.Management.Sdk.Sfc" #>
+<#@ assembly name="$(SolutionDir)T4NG.Utilities\bin\Debug\T4NG.Utilities.dll" #>
+<#@ import namespace="Microsoft.SqlServer" #>
+<#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
+<#@ import namespace="T4NG.Utilities" #>
+<#@ import namespace="System.Runtime.Remoting.Messaging" #>
+<#
+// <copyright file="Entity.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class <#= table.Name #>Entity
+    {
+	<#
+	PushIndent("\t");
+	PushIndent("\t");
+    foreach (Column column in table.Columns)
+    {
+        WriteLine("public " + T4Helper.ConvertToClrType(column.DataType.Name, column.Nullable) + " " + column.Name + "{ get; set; }");
+    }
+    PopIndent();
+	PopIndent();
+	#>
+	}
+}
+
+<#+
+Table table
+{
+    get { return (Table)CallContext.GetData("Standalone1.Parameter"); }
+}
+#>
